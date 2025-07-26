@@ -1,239 +1,162 @@
-import { useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Text, Float, Stars, Sparkles } from '@react-three/drei';
+import { useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Text, Float, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
-const PulsingCore = () => {
+const ChillSphere = () => {
   const meshRef = useRef();
-  const [scale, setScale] = useState(1);
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
-    const pulse = Math.sin(time * 3) * 0.3 + 1;
-    setScale(pulse);
-    
     if (meshRef.current) {
-      meshRef.current.rotation.x = time * 0.3;
-      meshRef.current.rotation.y = time * 0.7;
-      meshRef.current.rotation.z = time * 0.2;
+      meshRef.current.rotation.y = time * 0.1;
+      meshRef.current.rotation.x = Math.sin(time * 0.2) * 0.1;
     }
   });
 
   return (
-    <mesh ref={meshRef} scale={scale * 0.8}>
-      <octahedronGeometry args={[1, 2]} />
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[1.5, 32, 32]} />
       <meshStandardMaterial 
-        color="cyan" 
-        emissive="blue" 
-        emissiveIntensity={0.5}
-        transparent
-        opacity={0.8}
+        color="#4facfe" 
+        transparent 
+        opacity={0.7}
+        emissive="#00f5ff"
+        emissiveIntensity={0.1}
       />
     </mesh>
   );
 };
 
-const ColorShiftSphere = () => {
-  const meshRef = useRef();
-  const [color, setColor] = useState(new THREE.Color('hotpink'));
-
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    const hue = (time * 30) % 360;
-    setColor(new THREE.Color(`hsl(${hue}, 100%, 60%)`));
-    if (meshRef.current) {
-      meshRef.current.rotation.y = time * 0.8;
-      meshRef.current.rotation.x = time * 0.3;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} scale={2.5}>
-      <icosahedronGeometry args={[1, 3]} />
-      <meshStandardMaterial 
-        color={color} 
-        wireframe 
-        emissive={color}
-        emissiveIntensity={0.3}
-      />
-    </mesh>
-  );
+const FloatingCubes = () => {
+  const cubes = [];
+  
+  for (let i = 0; i < 8; i++) {
+    cubes.push(
+      <Float key={i} floatIntensity={2} speed={1 + i * 0.1}>
+        <mesh position={[
+          Math.sin(i * Math.PI / 4) * 4,
+          Math.cos(i * Math.PI / 3) * 2,
+          Math.sin(i * Math.PI / 6) * 3
+        ]}>
+          <boxGeometry args={[0.3, 0.3, 0.3]} />
+          <meshStandardMaterial 
+            color={`hsl(${200 + i * 20}, 70%, 60%)`}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+      </Float>
+    );
+  }
+  
+  return <>{cubes}</>;
 };
 
-const FloatingRings = () => {
-  const ring1Ref = useRef();
-  const ring2Ref = useRef();
-  const ring3Ref = useRef();
-
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    
-    if (ring1Ref.current) {
-      ring1Ref.current.rotation.x = time * 0.5;
-      ring1Ref.current.rotation.z = time * 0.3;
-    }
-    if (ring2Ref.current) {
-      ring2Ref.current.rotation.y = time * 0.7;
-      ring2Ref.current.rotation.x = time * 0.2;
-    }
-    if (ring3Ref.current) {
-      ring3Ref.current.rotation.z = time * 0.9;
-      ring3Ref.current.rotation.y = time * 0.4;
-    }
-  });
-
+const ChillText = () => {
   return (
-    <>
-      <mesh ref={ring1Ref} scale={4}>
-        <torusGeometry args={[1, 0.05, 8, 32]} />
-        <meshStandardMaterial color="magenta" emissive="magenta" emissiveIntensity={0.4} />
-      </mesh>
-      <mesh ref={ring2Ref} scale={3.5}>
-        <torusGeometry args={[1, 0.03, 8, 32]} />
-        <meshStandardMaterial color="yellow" emissive="yellow" emissiveIntensity={0.4} />
-      </mesh>
-      <mesh ref={ring3Ref} scale={5}>
-        <torusGeometry args={[1, 0.02, 8, 32]} />
-        <meshStandardMaterial color="lime" emissive="lime" emissiveIntensity={0.4} />
-      </mesh>
-    </>
-  );
-};
-
-const GlitchText = () => {
-  const textRef = useRef();
-  const [glitch, setGlitch] = useState(false);
-
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    if (Math.random() < 0.02) {
-      setGlitch(true);
-      setTimeout(() => setGlitch(false), 100);
-    }
-    
-    if (textRef.current) {
-      textRef.current.position.x = glitch ? (Math.random() - 0.5) * 0.2 : 0;
-    }
-  });
-
-  return (
-    <Float floatIntensity={6} speed={3}>
+    <Float floatIntensity={1} speed={2}>
       <Text
-        ref={textRef}
-        fontSize={0.8}
-        color={glitch ? "red" : "white"}
+        fontSize={0.6}
+        color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        position={[0, 3.5, 0]}
-        font="/fonts/helvetiker_bold.typeface.json"
+        position={[0, 3, 0]}
       >
-        {glitch ? "V1B3V3R53" : "VIBEVERSE"}
+        vibeverse
+      </Text>
+      <Text
+        fontSize={0.3}
+        color="#87ceeb"
+        anchorX="center"
+        anchorY="middle"
+        position={[0, 2.3, 0]}
+      >
+        ~ chill mode ~
       </Text>
     </Float>
   );
 };
 
-const ParticleField = () => {
-  const particlesRef = useRef();
-  const particleCount = 200;
-  
-  const positions = new Float32Array(particleCount * 3);
-  const colors = new Float32Array(particleCount * 3);
-  
-  for (let i = 0; i < particleCount; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 20;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
-    
-    colors[i * 3] = Math.random();
-    colors[i * 3 + 1] = Math.random();
-    colors[i * 3 + 2] = Math.random();
-  }
+const SoftRings = () => {
+  const ring1Ref = useRef();
+  const ring2Ref = useRef();
 
   useFrame(({ clock }) => {
-    if (particlesRef.current) {
-      particlesRef.current.rotation.y = clock.getElapsedTime() * 0.1;
+    const time = clock.getElapsedTime();
+    
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.z = time * 0.15;
+    }
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.x = time * 0.1;
     }
   });
 
   return (
-    <points ref={particlesRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
+    <>
+      <mesh ref={ring1Ref} scale={3}>
+        <torusGeometry args={[1, 0.02, 16, 100]} />
+        <meshStandardMaterial 
+          color="#ff9a9e" 
+          transparent 
+          opacity={0.6}
+          emissive="#ff9a9e"
+          emissiveIntensity={0.1}
         />
-        <bufferAttribute
-          attach="attributes-color"
-          count={particleCount}
-          array={colors}
-          itemSize={3}
+      </mesh>
+      <mesh ref={ring2Ref} scale={2.5}>
+        <torusGeometry args={[1, 0.015, 16, 100]} />
+        <meshStandardMaterial 
+          color="#a8edea" 
+          transparent 
+          opacity={0.5}
+          emissive="#a8edea"
+          emissiveIntensity={0.1}
         />
-      </bufferGeometry>
-      <pointsMaterial size={0.05} vertexColors transparent opacity={0.8} />
-    </points>
+      </mesh>
+    </>
   );
 };
 
-const CameraShake = () => {
-  const { camera } = useThree();
-  
-  useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    camera.position.x += Math.sin(time * 10) * 0.01;
-    camera.position.y += Math.cos(time * 15) * 0.01;
-  });
-  
-  return null;
-};
-
-const Lights = () => (
+const ChillLights = () => (
   <>
-    <ambientLight intensity={0.2} />
-    <directionalLight position={[5, 10, 7]} intensity={0.8} color="white" />
-    <pointLight position={[-10, -10, -10]} intensity={2} color="aqua" />
-    <pointLight position={[10, 10, 10]} intensity={2} color="magenta" />
-    <pointLight position={[0, -10, 5]} intensity={1.5} color="yellow" />
-    <spotLight
-      position={[0, 10, 0]}
-      angle={0.3}
-      penumbra={1}
-      intensity={2}
-      color="white"
-      target-position={[0, 0, 0]}
-    />
+    <ambientLight intensity={0.4} color="#f0f8ff" />
+    <directionalLight position={[5, 5, 5]} intensity={0.3} color="#ffffff" />
+    <pointLight position={[-5, 2, 5]} intensity={0.5} color="#87ceeb" />
+    <pointLight position={[5, -2, -5]} intensity={0.5} color="#dda0dd" />
   </>
 );
 
 export default function App() {
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 overflow-hidden">
-      <Canvas camera={{ position: [0, 0, 8], fov: 75 }}>
-        <OrbitControls enableZoom={true} autoRotate autoRotateSpeed={0.5} />
-        <Stars radius={300} depth={60} count={20000} factor={7} saturation={0} fade />
-        <Sparkles count={100} scale={10} size={6} speed={0.4} />
-        <Lights />
-        <ParticleField />
-        <FloatingRings />
-        <ColorShiftSphere />
-        <PulsingCore />
-        <GlitchText />
-        <CameraShake />
+    <div className="h-screen w-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 overflow-hidden">
+      <Canvas camera={{ position: [0, 0, 8], fov: 60 }}>
+        <OrbitControls 
+          enableZoom={true} 
+          autoRotate 
+          autoRotateSpeed={0.2}
+          enableDamping
+          dampingFactor={0.05}
+        />
+        <Stars radius={200} depth={50} count={5000} factor={4} saturation={0.5} fade />
+        <ChillLights />
+        <ChillSphere />
+        <SoftRings />
+        <FloatingCubes />
+        <ChillText />
       </Canvas>
       
-      {/* UI Overlay */}
-      <div className="absolute top-4 left-4 text-white font-mono text-sm opacity-70">
-        <div className="bg-black bg-opacity-50 p-2 rounded">
-          <div className="text-green-400">STATUS: ONLINE</div>
-          <div className="text-cyan-400">DIMENSION: ACTIVE</div>
-          <div className="text-magenta-400">VIBE: MAXIMUM</div>
+      <div className="absolute top-6 left-6 text-white font-light text-sm opacity-60">
+        <div className="bg-black bg-opacity-20 p-3 rounded-lg backdrop-blur-sm">
+          <div className="text-blue-300">✨ vibes: maximum chill</div>
+          <div className="text-purple-300">🌙 mode: relaxed</div>
+          <div className="text-pink-300">💫 energy: peaceful</div>
         </div>
       </div>
       
-      <div className="absolute bottom-4 right-4 text-white font-mono text-xs opacity-50">
-        <div>DRAG TO EXPLORE • SCROLL TO ZOOM</div>
+      <div className="absolute bottom-6 right-6 text-white font-light text-xs opacity-40">
+        <div>drag to float around • scroll to drift closer</div>
       </div>
     </div>
   );
