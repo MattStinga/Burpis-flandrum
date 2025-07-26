@@ -1,4 +1,13 @@
 {
+  "name": "vibeverse",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@react-three/drei": "^10.6.0",
     "@react-three/fiber": "^9.2.0",
